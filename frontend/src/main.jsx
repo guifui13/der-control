@@ -438,13 +438,14 @@ function NovaMedicao({ contratos, onDone }) {
         arquivoControle: controle,
       });
   
-      setResult(data);
       await onDone();
   
-      alert("Medição gerada com sucesso!");
+      setResult(data);
+  
+      alert("Medição gerada com sucesso! Acesse a aba Histórico para baixar o arquivo.");
     } catch (e) {
       console.error(e);
-      alert("Erro ao gerar medição. Verifique o histórico ou tente novamente.");
+      alert("Erro ao gerar medição: " + (e.message || "verifique o backend."));
     } finally {
       setLoading(false);
     }
