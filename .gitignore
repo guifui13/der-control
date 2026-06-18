@@ -1,0 +1,11 @@
+backend/.venv/
+backend/venv/
+backend/app/__pycache__/
+backend/app/routes/__pycache__/
+backend/app/sigmed.db
+backend/app/storage/uploads/
+backend/app/storage/outputs/
+*.pyc
+.DS_Store
+node_modules/
+dist/
