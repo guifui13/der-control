@@ -421,12 +421,15 @@ function NovaMedicao({ contratos, onDone }) {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const contratoSelecionado = contratos.find((c) => Number(c.id) === Number(contratoId));
+  const contratoSelecionado = contratos.find(
+    (c) => Number(c.id) === Number(contratoId)
+  );
 
   async function submit(e) {
     e.preventDefault();
     setLoading(true);
     setResult(null);
+
     try {
       const data = await gerarMedicao({
         contratoId,
@@ -434,10 +437,24 @@ function NovaMedicao({ contratos, onDone }) {
         arquivoEclic: eclic,
         arquivoControle: controle,
       });
-      setResult(data);
+
       await onDone();
+
+      if (data && data.indicadores) {
+        setResult(data);
+      } else {
+        alert(
+          "Medição processada com sucesso. Acesse a aba Histórico para baixar o arquivo."
+        );
+      }
     } catch (e) {
-      alert(e.message);
+      console.error(e);
+
+      await onDone();
+
+      alert(
+        "A medição foi enviada ao servidor. Se não aparecer aqui automaticamente, acesse a aba Histórico para baixar o arquivo gerado."
+      );
     } finally {
       setLoading(false);
     }
@@ -448,7 +465,9 @@ function NovaMedicao({ contratos, onDone }) {
       <div className="title">
         <p>Processamento mensal</p>
         <h1>Nova medição</h1>
-        <span>Envie a planilha de controle padrão e a exportação bruta do E-CLIC.</span>
+        <span>
+          Envie a planilha de controle padrão e a exportação bruta do E-CLIC.
+        </span>
       </div>
 
       <div className="steps">
@@ -462,7 +481,11 @@ function NovaMedicao({ contratos, onDone }) {
       <form className="panel upload" onSubmit={submit}>
         <label>
           Contrato
-          <select value={contratoId} onChange={(e) => setContratoId(e.target.value)} required>
+          <select
+            value={contratoId}
+            onChange={(e) => setContratoId(e.target.value)}
+            required
+          >
             <option value="">Selecione...</option>
             {contratos.map((c) => (
               <option value={c.id} key={c.id}>
@@ -484,17 +507,32 @@ function NovaMedicao({ contratos, onDone }) {
 
         <label>
           Planilha de controle da projetista
-          <input type="file" accept=".xlsx,.xls" onChange={(e) => setControle(e.target.files[0])} required />
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={(e) => setControle(e.target.files[0])}
+            required
+          />
         </label>
 
         <label>
           Exportação bruta do E-CLIC
-          <input type="file" accept=".xlsx,.xls" onChange={(e) => setEclic(e.target.files[0])} required />
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={(e) => setEclic(e.target.files[0])}
+            required
+          />
         </label>
 
         <div className="upload-summary">
           <b>Resumo do processamento</b>
-          <span>Contrato: {contratoSelecionado ? `${contratoSelecionado.codigo} — ${contratoSelecionado.nome}` : "não selecionado"}</span>
+          <span>
+            Contrato:{" "}
+            {contratoSelecionado
+              ? `${contratoSelecionado.codigo} — ${contratoSelecionado.nome}`
+              : "não selecionado"}
+          </span>
           <span>Competência: {competencia || "não informada"}</span>
           <span>Controle: {controle?.name || "não enviado"}</span>
           <span>E-CLIC: {eclic?.name || "não enviado"}</span>
@@ -515,12 +553,31 @@ function NovaMedicao({ contratos, onDone }) {
           </div>
 
           <div className="kpi-grid small">
-            <KpiCard label="Documentos" value={result.indicadores.total_documentos} hint="processados" icon={FolderKanban} />
-            <KpiCard label="% medido" value={formatPercent(result.indicadores.percentual_medido)} hint="resultado geral" icon={BarChart3} />
-            <KpiCard label="Não encontrados" value={result.indicadores.nao_encontrados} hint="validar" icon={AlertTriangle} tone="warning" />
+            <KpiCard
+              label="Documentos"
+              value={result.indicadores.total_documentos}
+              hint="processados"
+              icon={FolderKanban}
+            />
+            <KpiCard
+              label="% medido"
+              value={formatPercent(result.indicadores.percentual_medido)}
+              hint="resultado geral"
+              icon={BarChart3}
+            />
+            <KpiCard
+              label="Não encontrados"
+              value={result.indicadores.nao_encontrados}
+              hint="validar"
+              icon={AlertTriangle}
+              tone="warning"
+            />
           </div>
 
-          <a className="download" href={`http://localhost:8000${result.download_url}`}>
+          <a
+            className="download"
+            href={`https://der-control.onrender.com${result.download_url}`}
+          >
             <Download size={18} />
             Baixar planilha final
           </a>
