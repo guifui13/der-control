@@ -426,39 +426,36 @@ function NovaMedicao({ contratos, onDone }) {
   );
 
   async function submit(e) {
-    e.preventDefault();
-    setLoading(true);
-    setResult(null);
+  e.preventDefault();
+  setLoading(true);
+  setResult(null);
 
-    try {
-      const data = await gerarMedicao({
+  try {
+    const data = await Promise.race([
+      gerarMedicao({
         contratoId,
         competencia,
         arquivoEclic: eclic,
         arquivoControle: controle,
-      });
+      }),
+      new Promise((resolve) => setTimeout(() => resolve(null), 20000)),
+    ]);
 
-      await onDone();
+    await onDone();
 
-      if (data && data.indicadores) {
-        setResult(data);
-      } else {
-        alert(
-          "Medição processada com sucesso. Acesse a aba Histórico para baixar o arquivo."
-        );
-      }
-    } catch (e) {
-      console.error(e);
-
-      await onDone();
-
-      alert(
-        "A medição foi enviada ao servidor. Se não aparecer aqui automaticamente, acesse a aba Histórico para baixar o arquivo gerado."
-      );
-    } finally {
-      setLoading(false);
+    if (data && data.indicadores) {
+      setResult(data);
+    } else {
+      alert("Medição processada. Acesse a aba Histórico para baixar o arquivo.");
     }
+  } catch (e) {
+    console.error(e);
+    await onDone();
+    alert("Medição enviada. Verifique a aba Histórico.");
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <section>
