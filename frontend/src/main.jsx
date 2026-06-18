@@ -427,7 +427,6 @@ function NovaMedicao({ contratos, onDone }) {
     e.preventDefault();
     setLoading(true);
     setResult(null);
-
     try {
       const data = await gerarMedicao({
         contratoId,
@@ -435,7 +434,6 @@ function NovaMedicao({ contratos, onDone }) {
         arquivoEclic: eclic,
         arquivoControle: controle,
       });
-
       setResult(data);
       await onDone();
     } catch (e) {
