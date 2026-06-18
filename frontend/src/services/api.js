@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000";
+const API_URL = "https://der-control.onrender.com";
 
 export async function getContratos() {
   const res = await fetch(`${API_URL}/contratos`);
