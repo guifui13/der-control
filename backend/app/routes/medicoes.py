@@ -81,8 +81,11 @@ def gerar(
         "contrato_id": contrato_id,
         "competencia": competencia,
         "arquivo_saida": saida_path.name,
-        "indicadores": indicadores,
-        "nao_encontrados": nao_encontrados,
+        "indicadores": {
+            "total_documentos": indicadores.get("total_documentos", 0),
+            "percentual_medido": indicadores.get("percentual_medido", 0),
+            "nao_encontrados": len(nao_encontrados) if isinstance(nao_encontrados, list) else 0,
+        },
         "download_url": f"/medicoes/{medicao_id}/download",
     }
 
