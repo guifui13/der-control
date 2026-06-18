@@ -424,38 +424,31 @@ function NovaMedicao({ contratos, onDone }) {
   const contratoSelecionado = contratos.find(
     (c) => Number(c.id) === Number(contratoId)
   );
-
+  
   async function submit(e) {
-  e.preventDefault();
-  setLoading(true);
-  setResult(null);
-
-  try {
-    const data = await Promise.race([
-      gerarMedicao({
+    e.preventDefault();
+    setLoading(true);
+    setResult(null);
+  
+    try {
+      const data = await gerarMedicao({
         contratoId,
         competencia,
         arquivoEclic: eclic,
         arquivoControle: controle,
-      }),
-      new Promise((resolve) => setTimeout(() => resolve(null), 20000)),
-    ]);
-
-    await onDone();
-
-    if (data && data.indicadores) {
+      });
+  
       setResult(data);
-    } else {
-      alert("Medição processada. Acesse a aba Histórico para baixar o arquivo.");
+      await onDone();
+  
+      alert("Medição gerada com sucesso!");
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao gerar medição. Verifique o histórico ou tente novamente.");
+    } finally {
+      setLoading(false);
     }
-  } catch (e) {
-    console.error(e);
-    await onDone();
-    alert("Medição enviada. Verifique a aba Histórico.");
-  } finally {
-    setLoading(false);
   }
-}
 
   return (
     <section>
