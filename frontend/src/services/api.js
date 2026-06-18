@@ -30,9 +30,32 @@ export async function gerarMedicao({ contratoId, competencia, arquivoEclic, arqu
   form.append("arquivo_eclic", arquivoEclic);
   form.append("arquivo_controle", arquivoControle);
 
-  const res = await fetch(`${API_URL}/medicoes/gerar`, { method: "POST", body: form });
-  if (!res.ok) throw new Error((await res.json()).detail || "Erro ao gerar medição");
-  return res.json();
+  const res = await fetch(`${API_URL}/medicoes/gerar`, {
+    method: "POST",
+    body: form,
+  });
+
+  if (!res.ok) {
+    let msg = "Erro ao gerar medição";
+    try {
+      const erro = await res.json();
+      msg = erro.detail || msg;
+    } catch (_) {}
+    throw new Error(msg);
+  }
+
+  try {
+    return await res.json();
+  } catch (_) {
+    return {
+      indicadores: {
+        total_documentos: 0,
+        percentual_medido: 0,
+        nao_encontrados: 0,
+      },
+      download_url: "",
+    };
+  }
 }
 
 export function downloadUrl(id) {
